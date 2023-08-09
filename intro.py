@@ -16,11 +16,11 @@ while(count != 0):
         if difficultyLevel == 1:
             tableNumbers.append(random.randint(1, 10) )
         elif difficultyLevel == 2:
-            tableNumbers.append((random.randint(1, 16)-6))
+            tableNumbers.append((random.randint(1, 16) - 6))
         elif difficultyLevel == 3:
             tableNumbers.append((random.randint(1, 31) - 11))
         else:
-            tableNumbers.append((random.randint(1, 51)-21))
+            tableNumbers.append((random.randint(1, 51) - 21))
 
     #generating Signs
     for element in range(eqLength - 1):
