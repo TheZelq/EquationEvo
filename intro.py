@@ -1,4 +1,5 @@
 import random
+import time
 
 count = 1
 
@@ -60,6 +61,9 @@ while count != 0:
         if element < eqLength - 1:
             answerText += str(tableSigns[element]) + " "
 
+    # Setting the Start Time of the Game
+    start_time = time.time()
+
     # Taking User's Input
     print("Answer this question:")
     answerNum = int(input(answerText))
@@ -67,8 +71,10 @@ while count != 0:
     # Calculating a Solution
     solution = eval(answerText)
 
+    elapsed_time = time.time() - start_time
+
     # Comparing the Solution with user's Input
-    if solution == answerNum:
+    if solution == answerNum and elapsed_time <= 5:
         print("Good answer! \n")
         count += 1
         print("Level " + str(count) + ":")
@@ -82,7 +88,12 @@ while count != 0:
         if count % 3 == 1 and count <= 10:
             difficultyLevel += 1
 
-    # Finishing the game by wrong user input
+    # Finishing the game
     else:
         print("No, that's wrong! The answer was: " + str(solution))
+        count = 0
+
+    # Finishing the game by elapsed time
+    if elapsed_time > 5:
+        print("Time's up! The answer was: " + str(solution))
         count = 0
