@@ -73,8 +73,13 @@ while count != 0:
 
     elapsed_time = time.time() - start_time
 
+    # Finishing the game by elapsed time
+    if elapsed_time > 5:
+        print("Time's up! The answer was: " + str(solution))
+        count = 0
+
     # Comparing the Solution with user's Input
-    if solution == answerNum and elapsed_time <= 5:
+    elif solution == answerNum and elapsed_time <= 5:
         print("Good answer! \n")
         count += 1
         print("Level " + str(count) + ":")
@@ -91,9 +96,4 @@ while count != 0:
     # Finishing the game
     else:
         print("No, that's wrong! The answer was: " + str(solution))
-        count = 0
-
-    # Finishing the game by elapsed time
-    if elapsed_time > 5:
-        print("Time's up! The answer was: " + str(solution))
         count = 0
