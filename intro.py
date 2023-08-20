@@ -30,10 +30,10 @@ while count != 0:
 
     # Generating Signs
     for element in range(eqLength - 1):
-        if difficultyLevel == 1:  # No Multiplication on levels 1 - 3
+        if difficultyLevel == 1:  # No Multiplication on levels 1 - 4
             temp = random.randint(0, 1)
             tableSigns.append(operations[temp])
-        elif difficultyLevel == 2:  # Maximum 1 Multiplication on levels 4 - 6
+        elif difficultyLevel == 2:  # Maximum 1 Multiplication on levels 5 - 8
             if countMultiple < 1:
                 temp = random.randint(0, 2)
                 if temp == 2:
@@ -41,7 +41,7 @@ while count != 0:
             else:
                 temp = random.randint(0, 1)
             tableSigns.append(operations[temp])
-        elif difficultyLevel == 3:  # Maximum 2 Multiplications on levels 7 - 10
+        elif difficultyLevel == 3:  # Maximum 2 Multiplications on levels 9 - 12
             if countMultiple < 2:
                 temp = random.randint(0, 2)
                 if temp == 2:
@@ -49,7 +49,7 @@ while count != 0:
             else:
                 temp = random.randint(0, 1)
             tableSigns.append(operations[temp])
-        else:  # Maximum 3 Multiplications on levels 10+
+        else:  # Maximum 3 Multiplications on levels 13+
             if countMultiple < 3:
                 temp = random.randint(0, 2)
                 if temp == 2:
@@ -92,9 +92,9 @@ while count != 0:
         answerText = ""
         solution = 0
         countMultiple = 0
-        if count % 2 == 1:
+        if count % 2 == 1:  # Every Two levels add one number to equations
             eqLength += 1
-        if count % 3 == 1 and count <= 10:
+        if count % 4 == 1 and count <= 13:  # Every Four Levels, Increase the difficulty
             difficultyLevel += 1
 
     # Finishing the game
