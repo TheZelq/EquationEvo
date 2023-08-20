@@ -14,6 +14,9 @@ eqLength = 2
 difficultyLevel = 1
 countMultiple = 0
 TimeLimit = 5
+cleared_levels = []
+failed_attempt = None
+highest_cleared_level = 0
 
 print("Level 1:")
 while count != 0:
@@ -77,14 +80,11 @@ while count != 0:
     # Calculating the elapsed time
     elapsed_time = time.time() - start_time
 
-    # Finishing the game by elapsed time
-    if elapsed_time > 5:
-        print("Time's up! The answer was: " + str(solution) + ". \nYou answered in: {:.2f}s".format(elapsed_time))
-        count = 0
-
     # Comparing the Solution with user's Input
-    elif solution == answerNum and elapsed_time <= 5:
+    if solution == answerNum and elapsed_time <= 5:
         print("Correct! You answered in: {:.2f}s".format(elapsed_time) + "\n")
+        cleared_levels.append(count)
+        highest_cleared_level = max(cleared_levels)  # Update the highest cleared level
         count += 1
         print("Level " + str(count) + ":")
         tableNumbers = []
@@ -97,7 +97,21 @@ while count != 0:
         if count % 4 == 1 and count <= 13:  # Every Four Levels, Increase the difficulty
             difficultyLevel += 1
 
+    # Finishing the game by elapsed time
+    elif elapsed_time > 5:
+        print("Time's up! The answer was: " + str(solution) + ". \nYou answered in: {:.2f}s".format(elapsed_time))
+        failed_attempt = "Level {} - Correct Answer, answered in {:.2f}s".format(count, elapsed_time)
+        count = 0
+
     # Finishing the game
     else:
-        print("Incorrect! The answer was: " + str(solution))
+        print("Incorrect! The answer was: " + str(solution) + ". \nYou answered in: {:.2f}s".format(elapsed_time))
+        failed_attempt = "Level {} - Incorrect Answer".format(count)
         count = 0
+
+# Display summary
+if highest_cleared_level > 0:
+    print("\nSummary of Attempt:")
+    print("Highest Level Cleared: Level", highest_cleared_level)
+if failed_attempt:
+    print(failed_attempt)
