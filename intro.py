@@ -7,10 +7,13 @@ count = 1
 tableNumbers = []
 operations = ["+", "-", "*"]
 tableSigns = []
-eqLength = 2
 answerText = ""
+
+# Level Defining Variables
+eqLength = 2
 difficultyLevel = 1
 countMultiple = 0
+TimeLimit = 5
 
 print("Level 1:")
 while count != 0:
@@ -65,22 +68,23 @@ while count != 0:
     start_time = time.time()
 
     # Taking User's Input
-    print("Answer this question:")
+    print("Answer this question: | " + str(TimeLimit) + "s")
     answerNum = int(input(answerText))
 
     # Calculating a Solution
     solution = eval(answerText)
 
+    # Calculating the elapsed time
     elapsed_time = time.time() - start_time
 
     # Finishing the game by elapsed time
     if elapsed_time > 5:
-        print("Time's up! The answer was: " + str(solution))
+        print("Time's up! The answer was: " + str(solution) + ". \nYou answered in: {:.2f}s".format(elapsed_time))
         count = 0
 
     # Comparing the Solution with user's Input
     elif solution == answerNum and elapsed_time <= 5:
-        print("Good answer! \n")
+        print("Correct! You answered in: {:.2f}s".format(elapsed_time) + "\n")
         count += 1
         print("Level " + str(count) + ":")
         tableNumbers = []
@@ -95,5 +99,5 @@ while count != 0:
 
     # Finishing the game
     else:
-        print("No, that's wrong! The answer was: " + str(solution))
+        print("Incorrect! The answer was: " + str(solution))
         count = 0
