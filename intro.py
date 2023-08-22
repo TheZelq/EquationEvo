@@ -31,6 +31,7 @@ async def delvegame(ctx, bot):
     highest_cleared_level = 0
     fastest_time = float('inf')
     fastest_stage = None
+    answerText = ""
 
     while count != 0:
         # Generating Numbers and Signs
@@ -52,7 +53,18 @@ async def delvegame(ctx, bot):
                 tableSigns.append(operations[temp])
 
         # Construct the equation string
-        answerText = " ".join([f"{num} {sign}" for num, sign in zip(tableNumbers, tableSigns)] + [str(tableNumbers[-1])])
+        # Construct the equation string
+        answer_parts = []
+        index = 0
+        for num, sign in zip(tableNumbers, tableSigns):
+            if num < 0 and index != 0:
+                answer_parts.append(f"({num}) {sign}")
+            else:
+                answer_parts.append(f"{num} {sign}")
+            index += 1
+        answer_parts.append(f"({tableNumbers[-1]})" if tableNumbers[-1] < 0 else str(tableNumbers[-1]))
+
+        answerText = " ".join(answer_parts)
 
         # Set the start time of the game
         start_time = time.time()
