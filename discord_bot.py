@@ -2,7 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from intro import delvegame
+from intro import delve_game
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -21,7 +21,7 @@ async def on_ready():
 
 @bot.command()
 async def delve(ctx):
-    game_output = await delvegame(ctx, bot)  # Call the delve function without any parameters
+    game_output = await delve_game(ctx, bot)  # Call the delve function without any parameters
     await ctx.send(game_output)   # Send the game output as a message in the channel
 
 bot.run(TOKEN)

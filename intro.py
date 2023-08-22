@@ -14,66 +14,64 @@ def convert(user_response_content):
     return user_response_content
 
 
-async def delvegame(ctx, bot):
+async def delve_game(ctx, bot):
     count = 1
 
     # Mathematical Variables
     operations = ["+", "-", "*"]
-    solution = ""
 
     # Level Defining Variables
-    eqLength = 2
-    difficultyLevel = 1
-    countMultiple = 0
-    TimeLimit = 5
+    eq_length = 2
+    difficulty_level = 1
+    count_multiple = 0
+    timelimit = 5
     cleared_levels = []
     failed_attempt = None
     highest_cleared_level = 0
     fastest_time = float('inf')
     fastest_stage = None
-    answerText = ""
+    game_output = ""
 
     while count != 0:
         # Generating Numbers and Signs
-        tableNumbers = []
-        tableSigns = []
+        table_numbers = []
+        table_signs = []
 
-        for element in range(eqLength):
-            lower_limit = (difficultyLevel - 1) * -5
-            upper_limit = (difficultyLevel * 5) + 5
-            tableNumbers.append(random.randint(lower_limit, upper_limit))
+        for element in range(eq_length):
+            lower_limit = (difficulty_level - 1) * -5
+            upper_limit = (difficulty_level * 5) + 5
+            table_numbers.append(random.randint(lower_limit, upper_limit))
 
-            if element < eqLength - 1:
-                if countMultiple < get_max_multiplications(difficultyLevel):
+            if element < eq_length - 1:
+                if count_multiple < get_max_multiplications(difficulty_level):
                     temp = random.randint(0, 2)
                     if temp == 2:
-                        countMultiple += 1
+                        count_multiple += 1
                 else:
                     temp = random.randint(0, 1)
-                tableSigns.append(operations[temp])
+                table_signs.append(operations[temp])
 
-        # Construct the equation string
         # Construct the equation string
         answer_parts = []
         index = 0
-        for num, sign in zip(tableNumbers, tableSigns):
+        for num, sign in zip(table_numbers, table_signs):
             if num < 0 and index != 0:
                 answer_parts.append(f"({num}) {sign}")
             else:
                 answer_parts.append(f"{num} {sign}")
             index += 1
-        answer_parts.append(f"({tableNumbers[-1]})" if tableNumbers[-1] < 0 else str(tableNumbers[-1]))
+        answer_parts.append(f"({table_numbers[-1]})" if table_numbers[-1] < 0 else str(table_numbers[-1]))
 
-        answerText = " ".join(answer_parts)
+        answer_text = " ".join(answer_parts)
 
         # Set the start time of the game
         start_time = time.time()
 
         # Display the equation to the user
-        await ctx.send(f"Level {count}:\n{answerText}")
+        await ctx.send(f"Level {count}:\n{answer_text}")
 
         try:
-            user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=TimeLimit)
+            user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=timelimit)
 
             # Calculate the elapsed time
             elapsed_time = time.time() - start_time
@@ -81,10 +79,10 @@ async def delvegame(ctx, bot):
             converted = convert(user_response.content)
 
             if str(converted).isnumeric():
-                answerNum = int(user_response.content)
+                answer_num = int(user_response.content)
 
                 # Check user's answer and time
-                if answerNum == eval(answerText) and elapsed_time <= 5:
+                if answer_num == eval(answer_text) and elapsed_time <= 5:
                     game_output = "Correct! You answered in: {:.2f}s\n".format(elapsed_time)
                     cleared_levels.append(count)
                     highest_cleared_level = max(cleared_levels)
@@ -96,13 +94,13 @@ async def delvegame(ctx, bot):
 
                     count += 1
                     if count % 2 == 1:
-                        eqLength += 1
+                        eq_length += 1
                     if count % 4 == 1:
-                        difficultyLevel += 1
+                        difficulty_level += 1
 
                 else:
                     game_output = "Incorrect! The answer was: " + str(
-                        eval(answerText)) + ". \nYou answered in: {:.2f}s\n".format(elapsed_time)
+                        eval(answer_text)) + ". \nYou answered in: {:.2f}s\n".format(elapsed_time)
                     failed_attempt = "Level {} - Incorrect Answer".format(count)
                     count = 0
 
@@ -112,7 +110,7 @@ async def delvegame(ctx, bot):
                 count = 0
 
         except asyncio.TimeoutError:
-            game_output = "Time's up! The answer was: " + str(eval(answerText)) + ".\n"
+            game_output = "Time's up! The answer was: " + str(eval(answer_text)) + ".\n"
             failed_attempt = "Level {} - Time's up".format(count)
             count = 0
 
