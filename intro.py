@@ -8,6 +8,12 @@ def get_max_multiplications(difficulty_level):
     return max_multiplications_level[min(difficulty_level - 1, 3)]
 
 
+def convert(user_response_content):
+    user_response_content = user_response_content.strip()
+    user_response_content = user_response_content.replace("-", "", 1)
+    return user_response_content
+
+
 async def delvegame(ctx, bot):
     count = 1
 
@@ -21,7 +27,6 @@ async def delvegame(ctx, bot):
     countMultiple = 0
     TimeLimit = 5
     cleared_levels = []
-    elapsed_time = None
     failed_attempt = None
     highest_cleared_level = 0
     fastest_time = float('inf')
@@ -58,35 +63,40 @@ async def delvegame(ctx, bot):
         try:
             user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=TimeLimit)
 
-            try:
-                answerNum = int(user_response.content)
-            except ValueError:
-                game_output = "Invalid input! Please enter a numerical value."
-
             # Calculate the elapsed time
             elapsed_time = time.time() - start_time
 
-            # Check user's answer and time
-            if answerNum == eval(answerText) and elapsed_time <= 5:
-                game_output = "Correct! You answered in: {:.2f}s\n".format(elapsed_time)
-                cleared_levels.append(count)
-                highest_cleared_level = max(cleared_levels)
+            converted = convert(user_response.content)
 
-                # Updating the fastest time if the current time is faster
-                if elapsed_time < fastest_time:
-                    fastest_time = elapsed_time
-                    fastest_stage = count
+            if str(converted).isnumeric():
+                answerNum = int(user_response.content)
 
-                count += 1
-                if count % 2 == 1:
-                    eqLength += 1
-                if count % 4 == 1:
-                    difficultyLevel += 1
+                # Check user's answer and time
+                if answerNum == eval(answerText) and elapsed_time <= 5:
+                    game_output = "Correct! You answered in: {:.2f}s\n".format(elapsed_time)
+                    cleared_levels.append(count)
+                    highest_cleared_level = max(cleared_levels)
+
+                    # Updating the fastest time if the current time is faster
+                    if elapsed_time < fastest_time:
+                        fastest_time = elapsed_time
+                        fastest_stage = count
+
+                    count += 1
+                    if count % 2 == 1:
+                        eqLength += 1
+                    if count % 4 == 1:
+                        difficultyLevel += 1
+
+                else:
+                    game_output = "Incorrect! The answer was: " + str(
+                        eval(answerText)) + ". \nYou answered in: {:.2f}s\n".format(elapsed_time)
+                    failed_attempt = "Level {} - Incorrect Answer".format(count)
+                    count = 0
 
             else:
-                game_output = "Incorrect! The answer was: " + str(
-                    eval(answerText)) + ". \nYou answered in: {:.2f}s\n".format(elapsed_time)
-                failed_attempt = "Level {} - Incorrect Answer".format(count)
+                game_output = "Invalid input!"
+                failed_attempt = "Level {} - Invalid Answer".format(count)
                 count = 0
 
         except asyncio.TimeoutError:
