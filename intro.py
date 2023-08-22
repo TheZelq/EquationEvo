@@ -13,7 +13,7 @@ def convert(user_response_content):
     user_response_content = user_response_content.replace("-", "", 1)
     return user_response_content
 
-
+#test
 async def delvegame(ctx, bot):
     count = 1
 
