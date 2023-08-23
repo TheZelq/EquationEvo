@@ -74,7 +74,7 @@ async def delve_game(ctx, bot):
         start_time = time.time()
 
         # Display the equation to the user
-        await ctx.send(f"Level {count}: || {timelimit}s \n``{answer_text}``")
+        await ctx.send(f"Level {count}: | {timelimit}s | {ctx.author.mention}\n``{answer_text}``")
 
         try:
             user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=timelimit)
