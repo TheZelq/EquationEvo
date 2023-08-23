@@ -23,7 +23,6 @@ async def delve_game(ctx, bot):
     # Level Defining Variables
     eq_length = 2
     difficulty_level = 1
-    count_multiple = 0
     timelimit = 5
     cleared_levels = []
     failed_attempt = None
@@ -36,6 +35,7 @@ async def delve_game(ctx, bot):
         # Generating Numbers and Signs
         table_numbers = []
         table_signs = []
+        count_multiple = 0
 
         for element in range(eq_length):
             lower_limit = (difficulty_level - 1) * -5
@@ -43,12 +43,15 @@ async def delve_game(ctx, bot):
             table_numbers.append(random.randint(lower_limit, upper_limit))
 
             if element < eq_length - 1:
-                if count_multiple < get_max_multiplications(difficulty_level) and all(num <= upper_limit - 5 for num in table_numbers):
-                    temp = random.randint(0, 2)
-                    if temp == 2 and len(table_numbers) >= 2:  # Check for multiplication eligibility
-                        if table_numbers[-1] > upper_limit - 5 or table_numbers[-2] > upper_limit - 5:
-                            temp = random.randint(0, 1)  # Use addition or subtraction instead of multiplication
-                        count_multiple += 1
+                if count_multiple < get_max_multiplications(difficulty_level) and all(
+                        num <= upper_limit - 5 for num in table_numbers):
+                    eligible_numbers = [num for num in table_numbers if num <= upper_limit - 5]
+                    if len(eligible_numbers) >= 2:  # Check for multiplication eligibility
+                        temp = random.randint(0, 2)
+                        if temp == 2:
+                            count_multiple += 1
+                    else:
+                        temp = random.randint(0, 1)  # Use addition or subtraction instead of multiplication
                 else:
                     temp = random.randint(0, 1)
                 table_signs.append(operations[temp])
@@ -70,7 +73,7 @@ async def delve_game(ctx, bot):
         start_time = time.time()
 
         # Display the equation to the user
-        await ctx.send(f"Level {count}:\n{answer_text}")
+        await ctx.send(f"Level {count}: || {timelimit}s \n``{answer_text}``")
 
         try:
             user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=timelimit)
@@ -84,8 +87,8 @@ async def delve_game(ctx, bot):
                 answer_num = int(user_response.content)
 
                 # Check user's answer and time
-                if answer_num == eval(answer_text) and elapsed_time <= 5:
-                    game_output = "Correct! You answered in: {:.2f}s\n".format(elapsed_time)
+                if answer_num == eval(answer_text) and elapsed_time <= timelimit:
+                    game_output = "\nCorrect! You answered in: {:.2f}s\n".format(elapsed_time)
                     cleared_levels.append(count)
                     highest_cleared_level = max(cleared_levels)
 
@@ -99,26 +102,28 @@ async def delve_game(ctx, bot):
                         eq_length += 1
                     if count % 4 == 1:
                         difficulty_level += 1
+                        timelimit += 1
 
                 else:
-                    game_output = "Incorrect! The answer was: " + str(
-                        eval(answer_text)) + ". \nYou answered in: {:.2f}s\n".format(elapsed_time)
+                    game_output = "\nIncorrect! The answer was: " + str(
+                        eval(answer_text)) + ". You answered in: {:.2f}s".format(elapsed_time)
                     failed_attempt = "Level {} - Incorrect Answer".format(count)
                     count = 0
 
             else:
-                game_output = "Invalid input!"
+                game_output = "\nInvalid input! The answer was: " + str(eval(answer_text))
                 failed_attempt = "Level {} - Invalid Answer".format(count)
                 count = 0
 
         except asyncio.TimeoutError:
-            game_output = "Time's up! The answer was: " + str(eval(answer_text)) + ".\n"
-            failed_attempt = "Level {} - Time's up".format(count)
+            game_output = "\nTime's up! The answer was: " + str(eval(answer_text)) + ".\n"
+            failed_attempt = "Level {} - Out of Time".format(count)
             count = 0
 
     # Display summary
     output_parts = []
     if highest_cleared_level > 0:
+        output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
     if fastest_time != float('inf'):
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))

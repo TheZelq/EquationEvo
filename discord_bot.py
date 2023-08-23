@@ -17,6 +17,10 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
+    await bot.change_presence(activity=discord.Game(name="with the abyss"))  # Set bots activity
+    channel = bot.get_channel(1133542620551987361)  # Replace with the actual channel ID
+    if channel:
+        await channel.send("<@213540116386414592> It's delving time!")
 
 
 @bot.command()
