@@ -43,9 +43,11 @@ async def delve_game(ctx, bot):
             table_numbers.append(random.randint(lower_limit, upper_limit))
 
             if element < eq_length - 1:
-                if count_multiple < get_max_multiplications(difficulty_level):
+                if count_multiple < get_max_multiplications(difficulty_level) and all(num <= upper_limit - 5 for num in table_numbers):
                     temp = random.randint(0, 2)
-                    if temp == 2:
+                    if temp == 2 and len(table_numbers) >= 2:  # Check for multiplication eligibility
+                        if table_numbers[-1] > upper_limit - 5 or table_numbers[-2] > upper_limit - 5:
+                            temp = random.randint(0, 1)  # Use addition or subtraction instead of multiplication
                         count_multiple += 1
                 else:
                     temp = random.randint(0, 1)
