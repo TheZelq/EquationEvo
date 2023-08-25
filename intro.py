@@ -1,6 +1,7 @@
 import random
 import time
 import asyncio
+import database
 
 
 def get_max_multiplications(difficulty_level):
@@ -31,7 +32,6 @@ async def delve_game(ctx, bot):
     fastest_stage = None
     game_output = ""
     last_sign = ""
-    last_number = int()
 
     while count != 0:
         # Generating Numbers and Signs
@@ -43,7 +43,7 @@ async def delve_game(ctx, bot):
         for element in range(eq_length):
             lower_limit = (difficulty_level - 1) * -5
             if last_sign == "*":
-                upper_limit = (difficulty_level * 5)
+                upper_limit = (difficulty_level * 5) - 5
             else:
                 upper_limit = (difficulty_level * 5) + 5
             table_numbers.append(random.randint(lower_limit, upper_limit))
@@ -83,7 +83,7 @@ async def delve_game(ctx, bot):
         start_time = time.time()
 
         # Display the equation to the user
-        await ctx.send(f"{ctx.author.mention} | Level {count}: | {timelimit}s \n``{answer_text}``")
+        await ctx.send(f"{ctx.author.mention} | Level {count}: | {timelimit:.1f}s \n``{answer_text}``")
 
         try:
             user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=timelimit)
@@ -118,9 +118,9 @@ async def delve_game(ctx, bot):
                         count += 1
                         if count % 2 == 1:
                             eq_length += 1
+                            timelimit += 0.5
                         if count % 4 == 1:
                             difficulty_level += 1
-                            timelimit += 1
 
                     else:
                         game_output = "\nIncorrect! The answer was: " + str(
@@ -141,6 +141,8 @@ async def delve_game(ctx, bot):
     # Display summary
     output_parts = []
     if highest_cleared_level > 0:
+        # Update user's highest stage in database
+        database.update_highest_stage(ctx.author.id, highest_cleared_level)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
     if fastest_time != float('inf'):
