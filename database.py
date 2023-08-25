@@ -52,7 +52,7 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
         else:
             # Insert a new profile
             insert_query = ("INSERT INTO profiles (discord_id, name, equations_answered, highest_stage, "
-                            "highest_abs_answer, fastest_time) VALUES (%s, %s, %s, %s, %s)")
+                            "highest_abs_answer, fastest_time) VALUES (%s, %s, %s, %s, %s, %s)")
             cursor.execute(insert_query, (discord_id, discord_username, new_equations_answered, new_highest_stage,
                                           new_highest_abs_answer, rounded_fastest_time))
             connection.commit()
@@ -62,6 +62,33 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
         cursor.fetchall()
         cursor.close()
         connection.close()
+
+    except Exception as e:
+        print("Error:", e)
+
+
+def get_profile_data(discord_id):
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        select_query = "SELECT * FROM profiles WHERE discord_id = %s"
+        cursor.execute(select_query, (discord_id,))
+        result = cursor.fetchone()
+
+        if result:
+            profile_data = {
+                'name': result[2],
+                'currency': result[3],
+                'achievement_points': result[4],
+                'equations_solved': result[5],
+                'highest_stage': result[6],
+                'rounded_fastest_time': result[7],
+                'new_highest_abs_answer': result[8],
+            }
+            return profile_data
+        else:
+            return None
 
     except Exception as e:
         print("Error:", e)
