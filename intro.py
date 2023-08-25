@@ -32,6 +32,8 @@ async def delve_game(ctx, bot):
     fastest_stage = None
     game_output = ""
     last_sign = ""
+    highest_abs_answer = 0
+    correctly_answered = 0
 
     while count != 0:
         # Generating Numbers and Signs
@@ -103,6 +105,7 @@ async def delve_game(ctx, bot):
                     count = 0
                 else:
                     answer_num = int(user_response.content)
+                    abs_answer = abs(answer_num)
 
                     # Check user's answer and time
                     if answer_num == eval(answer_text) and elapsed_time <= timelimit:
@@ -110,11 +113,16 @@ async def delve_game(ctx, bot):
                         cleared_levels.append(count)
                         highest_cleared_level = max(cleared_levels)
 
+                        # Updating the highest absolute value answered
+                        if abs_answer > highest_abs_answer:
+                            highest_abs_answer = abs_answer
+
                         # Updating the fastest time if the current time is faster
                         if elapsed_time < fastest_time:
                             fastest_time = elapsed_time
                             fastest_stage = count
 
+                        correctly_answered += 1
                         count += 1
                         if count % 2 == 1:
                             eq_length += 1
@@ -140,12 +148,11 @@ async def delve_game(ctx, bot):
 
     # Display summary
     output_parts = []
-    if highest_cleared_level > 0:
-        # Update user's highest stage in database
-        database.update_highest_stage(ctx.author.id, highest_cleared_level)
+    if highest_cleared_level > 0 and fastest_time != float('inf'):
+        database.update_profile(ctx.author.id, highest_cleared_level, highest_abs_answer, fastest_time,
+                                correctly_answered)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
-    if fastest_time != float('inf'):
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))
     if failed_attempt:
         output_parts.append(failed_attempt)
