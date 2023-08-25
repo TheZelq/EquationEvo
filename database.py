@@ -6,7 +6,8 @@ def close(connection, cursor):
     connection.close()
 
 
-def update_profile(discord_id, new_highest_stage, new_highest_abs_answer, new_fastest_time, new_equations_answered):
+def update_profile(discord_id, discord_username, new_highest_stage, new_highest_abs_answer, new_fastest_time,
+                   new_equations_answered):
     try:
         connection = connect()
         cursor = connection.cursor()
@@ -20,13 +21,11 @@ def update_profile(discord_id, new_highest_stage, new_highest_abs_answer, new_fa
         result = cursor.fetchone()
 
         if result:
+            name = result[2]
             equations_answered = result[5]
             current_highest_stage = result[6]
             highest_abs_answer = result[8]
             current_fastest_time = result[7]
-
-            print("Equations_answered:", equations_answered)
-            print("New Equations answered", new_equations_answered)
 
             # Updating values if necessary
             update_values = {}
@@ -37,6 +36,8 @@ def update_profile(discord_id, new_highest_stage, new_highest_abs_answer, new_fa
                 update_values['highest_abs_answer'] = new_highest_abs_answer
             if current_fastest_time and rounded_fastest_time < float(current_fastest_time):
                 update_values['fastest_time'] = rounded_fastest_time
+            if name != discord_username:
+                update_values['name'] = discord_username
 
             if update_values:
                 update_query = "UPDATE profiles SET "
@@ -50,9 +51,10 @@ def update_profile(discord_id, new_highest_stage, new_highest_abs_answer, new_fa
 
         else:
             # Insert a new profile
-            insert_query = ("INSERT INTO profiles (discord_id, highest_stage, highest_abs_answer, fastest_time) "
-                            "VALUES (%s, %s, %s, %s)")
-            cursor.execute(insert_query, (discord_id, new_highest_stage, new_highest_abs_answer, rounded_fastest_time))
+            insert_query = ("INSERT INTO profiles (discord_id, name, equations_answered, highest_stage, "
+                            "highest_abs_answer, fastest_time) VALUES (%s, %s, %s, %s, %s)")
+            cursor.execute(insert_query, (discord_id, discord_username, new_equations_answered, new_highest_stage,
+                                          new_highest_abs_answer, rounded_fastest_time))
             connection.commit()
             print(f"New profile inserted for user {discord_id}")
 
@@ -61,24 +63,5 @@ def update_profile(discord_id, new_highest_stage, new_highest_abs_answer, new_fa
         cursor.close()
         connection.close()
 
-    except Exception as e:
-        print("Error:", e)
-
-
-def insert_new_profile(discord_id, discord_username, currency, achievement_points, equations_answered, highest_stage,
-                       fastest_time, highest_abs_answer):
-    try:
-        connection = connect()
-        cursor = connection.cursor()
-
-        insert_query = ("INSERT INTO profiles (discord_id, name, currency, achievement_points, equations_answered, "
-                        "highest_stage, fastest_time, highest_abs_answer) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)")
-        print("Executing query:", insert_query)
-        cursor.execute(insert_query, (discord_id, discord_username, currency, achievement_points, equations_answered,
-                                      highest_stage, fastest_time, highest_abs_answer))
-        connection.commit()
-        print(f"New profile inserted for user {discord_id}")
-
-        close(connection, cursor)
     except Exception as e:
         print("Error:", e)

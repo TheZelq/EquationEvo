@@ -148,9 +148,10 @@ async def delve_game(ctx, bot):
 
     # Display summary
     output_parts = []
+    discord_username = ctx.author.name
     if highest_cleared_level > 0 and fastest_time != float('inf'):
-        database.update_profile(ctx.author.id, highest_cleared_level, highest_abs_answer, fastest_time,
-                                correctly_answered)
+        database.update_profile(ctx.author.id, discord_username, highest_cleared_level, highest_abs_answer,
+                                fastest_time, correctly_answered)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))

@@ -25,7 +25,6 @@ async def on_ready():
 
 @bot.command()
 async def delve(ctx):
-    user_mention = ctx.author.mention
     game_output = await delve_game(ctx, bot)  # Call the delve function without any parameters
     await ctx.send(game_output)   # Send the game output as a message in the channel
 
