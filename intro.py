@@ -30,6 +30,8 @@ async def delve_game(ctx, bot):
     fastest_time = float('inf')
     fastest_stage = None
     game_output = ""
+    last_sign = ""
+    last_number = int()
 
     while count != 0:
         # Generating Numbers and Signs
@@ -40,21 +42,28 @@ async def delve_game(ctx, bot):
 
         for element in range(eq_length):
             lower_limit = (difficulty_level - 1) * -5
-            upper_limit = (difficulty_level * 5) + 5
+            if last_sign == "*":
+                upper_limit = (difficulty_level * 5)
+            else:
+                upper_limit = (difficulty_level * 5) + 5
             table_numbers.append(random.randint(lower_limit, upper_limit))
+            last_number = table_numbers[-1]
 
             if element < eq_length - 1:
-                if count_multiple < get_max_multiplications(difficulty_level) and all(
-                        num <= upper_limit - 5 for num in table_numbers):
-                    eligible_numbers = [num for num in table_numbers if num <= upper_limit - 5]
-                    if len(eligible_numbers) >= 2:  # Check for multiplication eligibility
-                        temp = random.randint(0, 2)
-                        if temp == 2:
-                            count_multiple += 1
-                    else:
-                        temp = random.randint(0, 1)  # Use addition or subtraction instead of multiplication
+                if last_sign == "*":
+                    temp = random.randint(0, 1)  # Choose between addition or subtraction
                 else:
-                    temp = random.randint(0, 1)
+                    if last_number < (upper_limit - 5):
+                        if count_multiple < get_max_multiplications(difficulty_level):
+                            temp = random.randint(0, 2)
+                            if temp == 2:
+                                count_multiple += 1
+                        else:
+                            temp = random.randint(0, 1)  # Choose between addition or subtraction
+                    else:
+                        temp = random.randint(0, 1)
+
+                last_sign = operations[temp]
                 table_signs.append(operations[temp])
 
         # Construct the equation string
@@ -74,7 +83,7 @@ async def delve_game(ctx, bot):
         start_time = time.time()
 
         # Display the equation to the user
-        await ctx.send(f"Level {count}: | {timelimit}s | {ctx.author.mention}\n``{answer_text}``")
+        await ctx.send(f"{ctx.author.mention} | Level {count}: | {timelimit}s \n``{answer_text}``")
 
         try:
             user_response = await bot.wait_for('message', check=lambda m: m.author == ctx.author, timeout=timelimit)
