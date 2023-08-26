@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from intro import delve_game
-from database import get_profile_data
+from database import get_profile_data, leaderboard_data
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -45,6 +45,7 @@ async def profile(ctx):
         highest_abs_answer = profile_data['new_highest_abs_answer']
 
         embed = discord.Embed(
+            title="Profile",
             color=0x10e3e3
         )
 
@@ -59,5 +60,37 @@ async def profile(ctx):
         await ctx.send(embed=embed)
     else:
         await ctx.send("Profile data not found.")
+
+
+@bot.command()
+async def leaderboard(ctx):
+    leaderboard = leaderboard_data()
+    name0 = leaderboard['name0']
+    name1 = leaderboard['name1']
+    name2 = leaderboard['name2']
+    name3 = leaderboard['name3']
+    # name4 = leaderboard['name4']
+
+    highest0 = leaderboard['highest0']
+    highest1 = leaderboard['highest1']
+    highest2 = leaderboard['highest2']
+    highest3 = leaderboard['highest3']
+    # highest4 = leaderboard['highest4']
+
+    record0 = str("#1: **") + name0 + str(" (") + str(highest0) + str(")**\n")
+    record1 = str("#2: **") + name1 + str(" (") + str(highest1) + str(")**\n")
+    record2 = str("#3: **") + name2 + str(" (") + str(highest2) + str(")**\n")
+    record3 = str("#4: **") + name3 + str(" (") + str(highest3) + str(")**\n")
+    # record4 = name4 + str(" (") + str(highest4) + str(")**")
+
+    leaderboard_text = record0 + record1 + record2 + record3
+
+    embed = discord.Embed(
+        title="EquationEvo Leaderboard",
+        color=0x32cd32
+    )
+    embed.add_field(name="", value=leaderboard_text)
+
+    await ctx.send(embed=embed)
 
 bot.run(TOKEN)

@@ -1,4 +1,5 @@
 from connector import connect
+from collections import ChainMap
 
 
 def close(connection, cursor):
@@ -87,6 +88,32 @@ def get_profile_data(discord_id):
                 'new_highest_abs_answer': result[8],
             }
             return profile_data
+        else:
+            return None
+
+    except Exception as e:
+        print("Error:", e)
+
+
+def leaderboard_data():
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        select_query = "SELECT name, highest_stage from Profiles ORDER BY highest_stage DESC LIMIT 5;"
+        cursor.execute(select_query)
+        result = cursor.fetchall()
+
+        if result:
+            leaderboard = {}
+            i = 0
+            for element in result:
+                a = {'name'+str(i): element[0]}
+                leaderboard = ChainMap(leaderboard, a)
+                a = {'highest'+str(i): element[1]}
+                leaderboard = ChainMap(leaderboard, a)
+                i += 1
+            return leaderboard
         else:
             return None
 
