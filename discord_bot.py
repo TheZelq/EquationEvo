@@ -31,9 +31,12 @@ async def delve(ctx):
 
 
 @bot.command()
-async def profile(ctx):
-    user_id = str(ctx.author.id)
-    profile_data = get_profile_data(user_id)
+async def profile(ctx, arg=None):
+    if arg is None:
+        user_name = str(ctx.author.name)
+    else:
+        user_name = str(arg)
+    profile_data = get_profile_data(user_name)
 
     if profile_data:
         name = profile_data['name']

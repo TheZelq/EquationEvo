@@ -68,13 +68,13 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
         print("Error:", e)
 
 
-def get_profile_data(discord_id):
+def get_profile_data(discord_name):
     try:
         connection = connect()
         cursor = connection.cursor()
 
-        select_query = "SELECT * FROM profiles WHERE discord_id = %s"
-        cursor.execute(select_query, (discord_id,))
+        select_query = "SELECT * FROM profiles WHERE name = %s"
+        cursor.execute(select_query, (discord_name,))
         result = cursor.fetchone()
 
         if result:
