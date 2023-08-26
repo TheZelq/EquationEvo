@@ -44,18 +44,20 @@ async def profile(ctx):
         fastest_stage = profile_data['rounded_fastest_time']
         highest_abs_answer = profile_data['new_highest_abs_answer']
 
-        profile_message = (
-            f"Name: {name}\n"
-            f"Currency: {currency}\n"
-            f"Achievement Points: {achievement_points}\n"
-            f"Equations Solved: {equations_solved}\n"
-            f"Highest Stage Solved: {highest_stage}\n"
-            f"Fastest Stage Time: {fastest_stage}\n"
-            f"Highest Solved Answer: {highest_abs_answer}\n"
+        embed = discord.Embed(
+            color=0x10e3e3
         )
-    else:
-        profile_message = "Profile data not found."
 
-    await ctx.send(profile_message)  # Send a user's profile.
+        embed.add_field(name="Name", value=name, inline=False)
+        embed.add_field(name="Currency", value=currency, inline=False)
+        embed.add_field(name="Achievement Points", value=achievement_points, inline=False)
+        embed.add_field(name="Equations Solved", value=equations_solved, inline=False)
+        embed.add_field(name="Highest Stage Solved", value=highest_stage, inline=False)
+        embed.add_field(name="Fastest Stage Time", value=fastest_stage, inline=False)
+        embed.add_field(name="Highest Solved Answer", value=highest_abs_answer, inline=False)
+
+        await ctx.send(embed=embed)
+    else:
+        await ctx.send("Profile data not found.")
 
 bot.run(TOKEN)
