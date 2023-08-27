@@ -62,7 +62,7 @@ async def profile(ctx, arg=None):
 
         await ctx.send(embed=embed)
     else:
-        await ctx.send("Profile data not found.")
+        await ctx.send("Profile data not found. Create one by delving once.")
 
 
 @bot.command()
@@ -72,21 +72,21 @@ async def leaderboard(ctx):
     name1 = leaderboard['name1']
     name2 = leaderboard['name2']
     name3 = leaderboard['name3']
-    # name4 = leaderboard['name4']
+    name4 = leaderboard['name4']
 
     highest0 = leaderboard['highest0']
     highest1 = leaderboard['highest1']
     highest2 = leaderboard['highest2']
     highest3 = leaderboard['highest3']
-    # highest4 = leaderboard['highest4']
+    highest4 = leaderboard['highest4']
 
     record0 = str("#1: **") + name0 + str(" (") + str(highest0) + str(")**\n")
     record1 = str("#2: **") + name1 + str(" (") + str(highest1) + str(")**\n")
     record2 = str("#3: **") + name2 + str(" (") + str(highest2) + str(")**\n")
     record3 = str("#4: **") + name3 + str(" (") + str(highest3) + str(")**\n")
-    # record4 = name4 + str(" (") + str(highest4) + str(")**")
+    record4 = str("#5: **") + name4 + str(" (") + str(highest4) + str(")**")
 
-    leaderboard_text = record0 + record1 + record2 + record3
+    leaderboard_text = record0 + record1 + record2 + record3 + record4
 
     embed = discord.Embed(
         title="EquationEvo Leaderboard",
