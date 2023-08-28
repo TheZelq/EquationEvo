@@ -1,6 +1,8 @@
 import random
 import time
 import asyncio
+
+import achievements
 import database
 
 
@@ -162,5 +164,10 @@ async def delve_game(ctx, bot):
     if game_output:
         output_parts.append(game_output)
 
+    a = achievements.achievements_solved(discord_username)
+    if a:
+        output_parts.append(a)
+
     game_output = "\n".join(output_parts)
+
     return game_output

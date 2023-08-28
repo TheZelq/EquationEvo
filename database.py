@@ -31,14 +31,16 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
             # Updating values if necessary
             update_values = {}
             update_values['equations_answered'] = equations_answered
-            if current_highest_stage and new_highest_stage > int(current_highest_stage):
+            if new_highest_stage > int(current_highest_stage):
                 update_values['highest_stage'] = new_highest_stage
             if highest_abs_answer is None or new_highest_abs_answer > int(highest_abs_answer):
                 update_values['highest_abs_answer'] = new_highest_abs_answer
-            if current_fastest_time and rounded_fastest_time < float(current_fastest_time):
+            if rounded_fastest_time < float(current_fastest_time):
                 update_values['fastest_time'] = rounded_fastest_time
             if name != discord_username:
                 update_values['name'] = discord_username
+            if current_fastest_time == 0:
+                update_values['fastest_time'] = rounded_fastest_time
 
             if update_values:
                 update_query = "UPDATE profiles SET "
