@@ -3,11 +3,10 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from intro import delve_game
-from database import get_profile_data, leaderboard_data
+from database import get_profile_data, leaderboard_data, get_achievements_data
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
-
 intents = discord.Intents.default()
 intents.typing = True
 intents.message_content = True  # Enable message content intent
@@ -93,6 +92,25 @@ async def leaderboard(ctx):
         color=0x32cd32
     )
     embed.add_field(name="", value=leaderboard_text)
+
+    await ctx.send(embed=embed)
+
+
+@bot.command()
+async def achievements(ctx, arg=None):
+    if arg is None:
+        user_name = str(ctx.author.name)
+    else:
+        user_name = str(arg)
+
+    achievements_data = get_achievements_data(user_name)
+
+    embed = discord.Embed(
+        title="Unlocked Achievements:",
+        color=0xff7f7f
+    )
+
+    embed.add_field(name="", value=achievements_data)
 
     await ctx.send(embed=embed)
 

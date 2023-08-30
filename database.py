@@ -96,6 +96,34 @@ def get_profile_data(discord_name):
     except Exception as e:
         print("Error:", e)
 
+def get_achievements_data(discord_name):
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        select_query = "SELECT user_id FROM profiles WHERE name = %s"
+        cursor.execute(select_query, (discord_name,))
+        result = cursor.fetchone()
+
+        if result:
+            user = str(result[0])
+            select_query2 = "SELECT achievement_name FROM achievements INNER JOIN unlocked_achievements ON achievements.achievement_id = unlocked_achievements.achievement_id WHERE unlocked_achievements.user_id = %s"
+            cursor.execute(select_query2, (user,))
+            result2 = cursor.fetchall()
+            if result2:
+                achievements = ""
+                for element in result2:
+                    achievements += element[0]
+                    achievements += "\n"
+                return achievements
+            else:
+                return "This user doesn't have any achievements."
+        else:
+            return None
+
+    except Exception as e:
+        print("Error:", e)
+
 
 def leaderboard_data():
     try:
