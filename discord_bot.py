@@ -3,7 +3,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from intro import delve_game
-from database import get_profile_data, leaderboard_data, get_achievements_data
+from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -106,12 +106,30 @@ async def achievements(ctx, arg=None):
     achievements_data = get_achievements_data(user_name)
 
     embed = discord.Embed(
-        title="Unlocked Achievements:",
+        title="Unlocked Achievements",
         color=0xff7f7f
     )
 
     embed.add_field(name="", value=achievements_data)
 
     await ctx.send(embed=embed)
+
+@bot.command()
+async def whatis(ctx, arg=None):
+    if arg is None:
+        await ctx.send("Put a command as an argument (ex. !whatis \"Initiating the Dive)\"")
+    else:
+        achievement_name = str(arg)
+
+        achievement_desc = get_achievement_desc(achievement_name)
+
+        embed = discord.Embed(
+            title=arg,
+            color=0xb1a29d
+        )
+
+        embed.add_field(name="", value=achievement_desc)
+
+        await ctx.send(embed=embed)
 
 bot.run(TOKEN)

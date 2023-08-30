@@ -124,13 +124,31 @@ def get_achievements_data(discord_name):
     except Exception as e:
         print("Error:", e)
 
+def get_achievement_desc(achievement_name):
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        select_query = "SELECT achievement_desc FROM achievements WHERE achievement_name = %s"
+        cursor.execute(select_query, (achievement_name,))
+        result = cursor.fetchone()
+
+        if result:
+            desc = result[0]
+            return desc
+        else:
+            return "There is no achievement under this name. Check if you don't have any spelling error or if you put the quotation marks."
+
+    except Exception as e:
+        print("Error:", e)
+
 
 def leaderboard_data():
     try:
         connection = connect()
         cursor = connection.cursor()
 
-        select_query = "SELECT name, highest_stage from Profiles ORDER BY highest_stage DESC LIMIT 5;"
+        select_query = "SELECT name, highest_stage from Profiles ORDER BY highest_stage DESC LIMIT 5"
         cursor.execute(select_query)
         result = cursor.fetchall()
 
