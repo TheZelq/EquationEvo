@@ -117,7 +117,7 @@ async def achievements(ctx, arg=None):
 @bot.command()
 async def whatis(ctx, arg=None):
     if arg is None:
-        await ctx.send("Put a command as an argument (ex. **!whatis \"Initiating the Dive\")**")
+        await ctx.send("Put a command as an argument (ex. **!whatis \"Initiating the Dive\"**)")
     else:
         achievement_name = str(arg)
 
