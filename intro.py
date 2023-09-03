@@ -110,27 +110,34 @@ async def delve_game(ctx, bot):
                     abs_answer = abs(answer_num)
 
                     # Check user's answer and time
-                    if answer_num == eval(answer_text) and elapsed_time <= timelimit:
-                        game_output = "\nCorrect! You answered in: {:.2f}s\n".format(elapsed_time)
-                        cleared_levels.append(count)
-                        highest_cleared_level = max(cleared_levels)
+                    if answer_num == eval(answer_text):
+                        if elapsed_time <= timelimit:
+                            game_output = "\nCorrect! You answered in: {:.2f}s\n".format(elapsed_time)
+                            cleared_levels.append(count)
+                            highest_cleared_level = max(cleared_levels)
 
-                        # Updating the highest absolute value answered
-                        if abs_answer > highest_abs_answer:
-                            highest_abs_answer = abs_answer
+                            # Updating the highest absolute value answered
+                            if abs_answer > highest_abs_answer:
+                                highest_abs_answer = abs_answer
 
-                        # Updating the fastest time if the current time is faster
-                        if elapsed_time < fastest_time:
-                            fastest_time = elapsed_time
-                            fastest_stage = count
+                            # Updating the fastest time if the current time is faster
+                            if elapsed_time < fastest_time:
+                                fastest_time = elapsed_time
+                                fastest_stage = count
 
-                        correctly_answered += 1
-                        count += 1
-                        if count % 2 == 1:
-                            eq_length += 1
-                            timelimit += 0.5
-                        if count % 4 == 1:
-                            difficulty_level += 1
+                            correctly_answered += 1
+                            count += 1
+                            if count % 2 == 1:
+                                eq_length += 1
+                                timelimit += 0.5
+                            if count % 4 == 1:
+                                difficulty_level += 1
+
+                        if elapsed_time >= timelimit:
+                            game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
+                                           .format(elapsed_time))
+                            failed_attempt = "Level {} - Out of Time".format(count)
+                            count = 0
 
                     else:
                         game_output = "\nIncorrect! The answer was: " + str(

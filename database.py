@@ -96,6 +96,7 @@ def get_profile_data(discord_name):
     except Exception as e:
         print("Error:", e)
 
+
 def get_achievements_data(discord_name):
     try:
         connection = connect()
@@ -107,7 +108,9 @@ def get_achievements_data(discord_name):
 
         if result:
             user = str(result[0])
-            select_query2 = "SELECT achievement_name FROM achievements INNER JOIN unlocked_achievements ON achievements.achievement_id = unlocked_achievements.achievement_id WHERE unlocked_achievements.user_id = %s"
+            select_query2 = ("SELECT achievement_name FROM achievements INNER JOIN unlocked_achievements ON "
+                             "achievements.achievement_id = unlocked_achievements.achievement_id WHERE "
+                             "unlocked_achievements.user_id = %s")
             cursor.execute(select_query2, (user,))
             result2 = cursor.fetchall()
             if result2:
@@ -124,6 +127,7 @@ def get_achievements_data(discord_name):
     except Exception as e:
         print("Error:", e)
 
+
 def get_achievement_desc(achievement_name):
     try:
         connection = connect()
@@ -137,7 +141,8 @@ def get_achievement_desc(achievement_name):
             desc = result[0]
             return desc
         else:
-            return "There is no achievement under this name. Check if you don't have any spelling error or if you put the quotation marks."
+            return ("There is no achievement under this name. Check if you don't have any spelling error or if you "
+                    "put the quotation marks.")
 
     except Exception as e:
         print("Error:", e)

@@ -7,7 +7,8 @@ def achievements_solved(discord_name):
         cursor = connection.cursor()
         achievement_text = ""
 
-        select_query = "SELECT user_id, equations_answered, highest_stage FROM profiles WHERE name = %s"
+        select_query = ("SELECT user_id, equations_answered, highest_stage, highest_abs_answer FROM profiles WHERE "
+                        "name = %s")
         cursor.execute(select_query, (discord_name,))
         result = cursor.fetchone()
 
@@ -15,6 +16,7 @@ def achievements_solved(discord_name):
             user_id = result[0]
             equations_answered = result[1]
             highest_stage = result[2]
+            highest_abs_answer = result[3]
             achievements = []
 
             select_query = "SELECT * FROM unlocked_achievements WHERE user_id = %s"
@@ -96,6 +98,24 @@ def achievements_solved(discord_name):
                 select_query = "INSERT INTO unlocked_achievements (user_id, achievement_id) VALUES (%s, %s)"
                 achievement_text += "Achievement Unlocked: **Eternal Equation Enigma** \n"
                 cursor.execute(select_query, (user_id, 12))
+                connection.commit()
+
+            if highest_abs_answer >= 10 and achievements.count(13) == 0:
+                select_query = "INSERT INTO unlocked_achievements (user_id, achievement_id) VALUES (%s, %s)"
+                achievement_text += "Achievement Unlocked: **Masterful Equator** \n"
+                cursor.execute(select_query, (user_id, 13))
+                connection.commit()
+
+            if highest_abs_answer >= 100 and achievements.count(14) == 0:
+                select_query = "INSERT INTO unlocked_achievements (user_id, achievement_id) VALUES (%s, %s)"
+                achievement_text += "Achievement Unlocked: **Champion of Complexity** \n"
+                cursor.execute(select_query, (user_id, 14))
+                connection.commit()
+
+            if highest_abs_answer >= 1000 and achievements.count(15) == 0:
+                select_query = "INSERT INTO unlocked_achievements (user_id, achievement_id) VALUES (%s, %s)"
+                achievement_text += "Achievement Unlocked: **Eternal Equation Enigma** \n"
+                cursor.execute(select_query, (user_id, 15))
                 connection.commit()
 
         cursor.close()

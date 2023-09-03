@@ -114,6 +114,7 @@ async def achievements(ctx, arg=None):
 
     await ctx.send(embed=embed)
 
+
 @bot.command()
 async def whatis(ctx, arg=None):
     if arg is None:
