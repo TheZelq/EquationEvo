@@ -36,6 +36,7 @@ async def delve_game(ctx, bot):
     last_sign = ""
     highest_abs_answer = 0
     correctly_answered = 0
+    currency = 0
 
     while count != 0:
         # Generating Numbers and Signs
@@ -127,6 +128,7 @@ async def delve_game(ctx, bot):
 
                             correctly_answered += 1
                             count += 1
+                            currency += ((1+(timelimit-elapsed_time)) * difficulty_level * (eq_length - 1))
                             if count % 2 == 1:
                                 eq_length += 1
                                 timelimit += 0.5
@@ -158,12 +160,14 @@ async def delve_game(ctx, bot):
     # Display summary
     output_parts = []
     discord_username = ctx.author.name
+    currency_rounded = round(currency)
     if highest_cleared_level > 0 and fastest_time != float('inf'):
-        database.update_profile(ctx.author.id, discord_username, highest_cleared_level, highest_abs_answer,
+        database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level, highest_abs_answer,
                                 fastest_time, correctly_answered)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))
+        output_parts.append("You earned: {} currency.\n".format(currency_rounded))
     if failed_attempt:
         output_parts.append(failed_attempt)
 

@@ -7,8 +7,8 @@ def close(connection, cursor):
     connection.close()
 
 
-def update_profile(discord_id, discord_username, new_highest_stage, new_highest_abs_answer, new_fastest_time,
-                   new_equations_answered):
+def update_profile(discord_id, discord_username, currency_added, new_highest_stage, new_highest_abs_answer,
+                   new_fastest_time, new_equations_answered):
     try:
         connection = connect()
         cursor = connection.cursor()
@@ -23,6 +23,7 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
 
         if result:
             name = result[2]
+            currency = result[3]
             equations_answered = result[5]
             current_highest_stage = result[6]
             highest_abs_answer = result[8]
@@ -31,6 +32,7 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
             # Updating values if necessary
             update_values = {}
             update_values['equations_answered'] = equations_answered
+            update_values['currency'] = currency
             if new_highest_stage > int(current_highest_stage):
                 update_values['highest_stage'] = new_highest_stage
             if highest_abs_answer is None or new_highest_abs_answer > int(highest_abs_answer):
@@ -46,9 +48,11 @@ def update_profile(discord_id, discord_username, new_highest_stage, new_highest_
                 update_query = "UPDATE profiles SET "
                 update_query += ", ".join([f"{key} = %s" for key in update_values.keys()])
                 update_query += ", equations_answered = equations_answered + %s"  # Add equations_answered update
+                update_query += ", currency = currency + %s"  # Add currency update
                 update_query += " WHERE discord_id = %s"
 
-                cursor.execute(update_query, list(update_values.values()) + [new_equations_answered, discord_id])
+                cursor.execute(update_query, list(update_values.values()) + [new_equations_answered, currency_added,
+                                                                             discord_id])
                 connection.commit()
                 print(f"Profile updated for user {discord_id}")
 
