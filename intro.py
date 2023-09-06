@@ -37,6 +37,7 @@ async def delve_game(ctx, bot):
     highest_abs_answer = 0
     correctly_answered = 0
     currency = 0
+    consolidation_prize = 0
 
     while count != 0:
         # Generating Numbers and Signs
@@ -157,19 +158,29 @@ async def delve_game(ctx, bot):
             failed_attempt = "Level {} - Out of Time".format(count)
             count = 0
 
+        # Checking if the player has failed before level 5 to award a specific item for them
+        if highest_cleared_level <= 5 and count == 0 and random.randint(1, 32) <= 32:
+            currency += 25  # Adding currency automatically
+            consolidation_prize = 1
+
     # Display summary
     output_parts = []
     discord_username = ctx.author.name
     currency_rounded = round(currency)
+
     if highest_cleared_level > 0 and fastest_time != float('inf'):
-        database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level, highest_abs_answer,
-                                fastest_time, correctly_answered)
+        database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level,
+                                highest_abs_answer, fastest_time, correctly_answered)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))
         output_parts.append("You earned: {} currency.\n".format(currency_rounded))
+
     if failed_attempt:
         output_parts.append(failed_attempt)
+
+    if consolidation_prize == 1:
+        output_parts.append("Luck is on your side. You found **A Quarter**.")
 
     # Join the output parts and return the game output as a string
     if game_output:
