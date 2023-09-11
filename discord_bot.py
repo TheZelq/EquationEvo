@@ -2,10 +2,8 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-
 from intro import delve_game
-from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc, unlock_shop_access
-from shop import shop_items, shop_access
+from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -149,62 +147,5 @@ async def whatis(ctx, arg=None):
         embed.add_field(name="", value=achievement_desc)
 
         await ctx.send(embed=embed)
-
-
-@bot.command()
-async def shop(ctx):
-    # Get user's data
-    user_name = str(ctx.author.name)
-    profile_data = get_profile_data(user_name)
-
-    if not profile_data:
-        await ctx.send("Profile data not found. Create one by delving once.")
-        return
-
-    # Checking if user can access the shop
-    if not shop_access(profile_data):
-        await ctx.send("Beyond the veil of ignorance, the Emporium's allure stays hidden, awaiting your descent into "
-                       "the abyss of revelation.")
-        return
-
-    # Display the shop in a direct message
-    user = ctx.author
-    embed = discord.Embed(
-        title="The Emporium",
-        description="Welcome to the emporium.",
-        color=0x9400D3,
-    )
-
-    for item in shop_items:
-        embed.add_field(
-            name=item["name"],
-            value=f"{item['description']}\nPrice: {item['price']} currency",
-            inline=False,
-        )
-
-    await user.send(embed=embed)
-    await ctx.send("Only in solitude may the Emporium's mysteries be revealed. The enigmatic proprietor shuns all "
-                   "witnesses but the chosen.")
-
-
-@bot.command()
-async def unlock_shop(ctx):
-    # Getting user data
-    user_id = ctx.author.id
-    profile_data = get_profile_data(ctx.author.name)
-
-    if not profile_data:
-        await ctx.send("Profile data not found. Create one by delving once.")
-        return
-
-    # Checking if user can unlock the shop
-    if (profile_data.get("highest_stage", 0) >= 9 and profile_data.get("currency", 0) >= 2000 and profile_data.get
-            ("shop_access", 0) == 0):
-        await unlock_shop_access(user_id)
-        await ctx.send("Congratulations, unlocker of secrets. The Emporium's enigmatic embrace now welcomes your "
-                       "presence.")
-    else:
-        await ctx.send("The Emporium's gatekeeper discerns worthiness in the hearts of seekers. Approach only if your "
-                       "purpose resonates with the enigmatic path it guards.")
 
 bot.run(TOKEN)
