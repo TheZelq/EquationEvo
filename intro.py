@@ -159,11 +159,9 @@ async def delve_game(ctx, bot):
             count = 0
 
         # Checking if the player has failed before level 5 to award a specific item for them
-        if highest_cleared_level <= 4 and count == 0:
-            quarter_chance = random.randint(1, 32)
-            if quarter_chance <= 1:
-                currency += 25  # Adding currency automatically
-                consolidation_prize = 1
+        if highest_cleared_level <= 5 and count == 0 and random.randint(1, 32) <= 32:
+            currency += 25  # Adding currency automatically
+            consolidation_prize = 1
 
     # Display summary
     output_parts = []
