@@ -74,20 +74,35 @@ async def leaderboard(ctx):
     name2 = leaderboard['name2']
     name3 = leaderboard['name3']
     name4 = leaderboard['name4']
+    name5 = leaderboard['name5']
+    name6 = leaderboard['name6']
+    name7 = leaderboard['name7']
+    name8 = leaderboard['name8']
+    name9 = leaderboard['name9']
 
     highest0 = leaderboard['highest0']
     highest1 = leaderboard['highest1']
     highest2 = leaderboard['highest2']
     highest3 = leaderboard['highest3']
     highest4 = leaderboard['highest4']
+    highest5 = leaderboard['highest5']
+    highest6 = leaderboard['highest6']
+    highest7 = leaderboard['highest7']
+    highest8 = leaderboard['highest8']
+    highest9 = leaderboard['highest9']
 
     record0 = str("#1: **") + name0 + str(" (") + str(highest0) + str(")**\n")
     record1 = str("#2: **") + name1 + str(" (") + str(highest1) + str(")**\n")
     record2 = str("#3: **") + name2 + str(" (") + str(highest2) + str(")**\n")
     record3 = str("#4: **") + name3 + str(" (") + str(highest3) + str(")**\n")
-    record4 = str("#5: **") + name4 + str(" (") + str(highest4) + str(")**")
+    record4 = str("#5: **") + name4 + str(" (") + str(highest4) + str(")**\n")
+    record5 = str("#6: **") + name5 + str(" (") + str(highest5) + str(")**\n")
+    record6 = str("#7: **") + name6 + str(" (") + str(highest6) + str(")**\n")
+    record7 = str("#8: **") + name7 + str(" (") + str(highest7) + str(")**\n")
+    record8 = str("#9: **") + name8 + str(" (") + str(highest8) + str(")**\n")
+    record9 = str("#10: **") + name9 + str(" (") + str(highest9) + str(")**")
 
-    leaderboard_text = record0 + record1 + record2 + record3 + record4
+    leaderboard_text = record0 + record1 + record2 + record3 + record4 + record5 + record6 + record7 + record8 + record9
 
     embed = discord.Embed(
         title="EquationEvo Leaderboard",
