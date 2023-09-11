@@ -157,7 +157,7 @@ def leaderboard_data():
         connection = connect()
         cursor = connection.cursor()
 
-        select_query = "SELECT name, highest_stage from Profiles ORDER BY highest_stage DESC LIMIT 5"
+        select_query = "SELECT name, highest_stage from Profiles ORDER BY highest_stage DESC LIMIT 10"
         cursor.execute(select_query)
         result = cursor.fetchall()
 
