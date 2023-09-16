@@ -3,6 +3,7 @@ import discord
 from discord.ext import commands
 from dotenv import load_dotenv
 from intro import delve_game
+from timelimit import tld_game
 from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc
 
 load_dotenv()
@@ -26,6 +27,12 @@ async def on_ready():
 @bot.command()
 async def delve(ctx):
     game_output = await delve_game(ctx, bot)  # Call the delve function without any parameters
+    await ctx.send(game_output)   # Send the game output as a message in the channel
+
+
+@bot.command()
+async def tld(ctx):
+    game_output = await tld_game(ctx, bot)  # Call the delve function without any parameters
     await ctx.send(game_output)   # Send the game output as a message in the channel
 
 
@@ -93,7 +100,6 @@ async def leaderboard(ctx):
     record1 = str("#2: **") + name1 + str(" (") + str(highest1) + str(")**\n")
     record2 = str("#3: **") + name2 + str(" (") + str(highest2) + str(")**\n")
     record3 = str("#4: **") + name3 + str(" (") + str(highest3) + str(")**\n")
-    record4 = str("#5: **") + name4 + str(" (") + str(highest4) + str(")**\n")
     record4 = str("#5: **") + name4 + str(" (") + str(highest4) + str(")**\n")
     record5 = str("#6: **") + name5 + str(" (") + str(highest5) + str(")**\n")
     record6 = str("#7: **") + name6 + str(" (") + str(highest6) + str(")**\n")
