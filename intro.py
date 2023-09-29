@@ -119,7 +119,7 @@ async def play_game(ctx, bot, ruleset):
 
                     # Check user's answer and time
                     if answer_num == eval(answer_text):
-                        if elapsed_time <= timelimit:
+                        if elapsed_time <= timelimit and ruleset == "delve" or timelimit > 0 and ruleset == "tld":
                             game_output = "\nCorrect! You answered in: {:.2f}s\n".format(elapsed_time)
                             cleared_levels.append(count)
                             highest_cleared_level = max(cleared_levels)
@@ -148,18 +148,11 @@ async def play_game(ctx, bot, ruleset):
                             if count % 4 == 1:
                                 difficulty_level += 1
 
-                        if ruleset == "delve":
-                            if elapsed_time >= timelimit:
-                                game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
-                                               .format(elapsed_time))
-                                failed_attempt = "Level {} - Out of Time".format(count)
-                                count = 0
                         else:
-                            if timelimit <= 0:
-                                game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
-                                               .format(elapsed_time))
-                                failed_attempt = "Level {} - Out of Time".format(count)
-                                count = 0
+                            game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
+                                           .format(elapsed_time))
+                            failed_attempt = "Level {} - Out of Time".format(count)
+                            count = 0  # Ensures the game doesn't generate next level if the time limit is exceeded
 
                     else:
                         game_output = "\nIncorrect! The answer was: " + str(
