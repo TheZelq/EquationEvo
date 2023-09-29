@@ -85,14 +85,17 @@ def tld_update_profile(discord_id, discord_username, currency_added, new_equatio
         result = cursor.fetchone()
 
         if result:
-            name = result[1]
-            currency = result[2]
-            equations_answered = result[3]
-            tld_highest_stage = result[4]
+            name = result[2]
+            currency = result[3]
+            equations_answered = result[5]
+            tld_highest_stage = result[7]
 
             # Updating values if necessary
             update_values = {}
+            update_values['equations_answered'] = equations_answered
+            update_values['currency'] = currency
             if new_tld_highest_stage > int(tld_highest_stage):
+                print(new_tld_highest_stage, tld_highest_stage)
                 update_values['tld_highest_stage'] = new_tld_highest_stage
             if name != discord_username:
                 update_values['name'] = discord_username
@@ -113,7 +116,8 @@ def tld_update_profile(discord_id, discord_username, currency_added, new_equatio
             # Insert a new profile
             insert_query = ("INSERT INTO profiles (discord_id, name, currency, equations_answered, tld_highest_stage)"
                             " VALUES (%s, %s, %s, %s, %s)")
-            cursor.execute(insert_query, (discord_id, discord_username, currency_added, new_equations_answered, new_tld_highest_stage,))
+            cursor.execute(insert_query, (discord_id, discord_username, currency_added, new_equations_answered,
+                                          new_tld_highest_stage,))
             connection.commit()
             print(f"New profile inserted for user {discord_id}")
 
