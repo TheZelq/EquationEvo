@@ -2,8 +2,7 @@ import os
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from intro import delve_game
-from timelimit import tld_game
+from intro import play_game
 from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc
 
 load_dotenv()
@@ -26,13 +25,15 @@ async def on_ready():
 
 @bot.command()
 async def delve(ctx):
-    game_output = await delve_game(ctx, bot)  # Call the delve function without any parameters
+    ruleset = "delve"
+    game_output = await play_game(ctx, bot, ruleset)  # Call the delve function without any parameters
     await ctx.send(game_output)   # Send the game output as a message in the channel
 
 
 @bot.command()
 async def tld(ctx):
-    game_output = await tld_game(ctx, bot)  # Call the delve function without any parameters
+    ruleset = "tld"
+    game_output = await play_game(ctx, bot, ruleset)  # Call the delve function without any parameters
     await ctx.send(game_output)   # Send the game output as a message in the channel
 
 

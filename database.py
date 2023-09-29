@@ -74,6 +74,58 @@ def update_profile(discord_id, discord_username, currency_added, new_highest_sta
         print("Error:", e)
 
 
+def tld_update_profile(discord_id, discord_username, currency_added, new_equations_answered, new_tld_highest_stage):
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        # Retrieve the current profile from the database
+        select_query = "SELECT * FROM profiles WHERE discord_id = %s"
+        cursor.execute(select_query, (discord_id,))
+        result = cursor.fetchone()
+
+        if result:
+            name = result[1]
+            currency = result[2]
+            equations_answered = result[3]
+            tld_highest_stage = result[4]
+
+            # Updating values if necessary
+            update_values = {}
+            if new_tld_highest_stage > int(tld_highest_stage):
+                update_values['tld_highest_stage'] = new_tld_highest_stage
+            if name != discord_username:
+                update_values['name'] = discord_username
+
+            if update_values:
+                update_query = "UPDATE profiles SET "
+                update_query += ", ".join([f"{key} = %s" for key in update_values.keys()])
+                update_query += ", equations_answered = equations_answered + %s"  # Add equations_answered update
+                update_query += ", currency = currency + %s"  # Add currency update
+                update_query += " WHERE discord_id = %s"
+
+                cursor.execute(update_query, list(update_values.values()) + [new_equations_answered, currency_added,
+                                                                             discord_id])
+                connection.commit()
+                print(f"Profile updated for user {discord_id}")
+
+        else:
+            # Insert a new profile
+            insert_query = ("INSERT INTO profiles (discord_id, name, currency, equations_answered, tld_highest_stage)"
+                            " VALUES (%s, %s, %s, %s, %s)")
+            cursor.execute(insert_query, (discord_id, discord_username, currency_added, new_equations_answered, new_tld_highest_stage,))
+            connection.commit()
+            print(f"New profile inserted for user {discord_id}")
+
+            # Consume the results before closing
+        cursor.fetchall()
+        cursor.close()
+        connection.close()
+
+    except Exception as e:
+        print("Error:", e)
+
+
 def get_profile_data(discord_name):
     try:
         connection = connect()

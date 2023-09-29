@@ -17,7 +17,7 @@ def convert(user_response_content):
     return user_response_content
 
 
-async def delve_game(ctx, bot):
+async def play_game(ctx, bot, ruleset):
     count = 1
 
     # Mathematical Variables
@@ -26,7 +26,6 @@ async def delve_game(ctx, bot):
     # Level Defining Variables
     eq_length = 2
     difficulty_level = 1
-    timelimit = 5
     cleared_levels = []
     failed_attempt = None
     highest_cleared_level = 0
@@ -38,6 +37,11 @@ async def delve_game(ctx, bot):
     correctly_answered = 0
     currency = 0
     consolidation_prize = 0
+
+    if ruleset == "delve":
+        timelimit = 5
+    else:
+        timelimit = 60
 
     while count != 0:
         # Generating Numbers and Signs
@@ -96,6 +100,8 @@ async def delve_game(ctx, bot):
 
             # Calculate the elapsed time
             elapsed_time = time.time() - start_time
+            if ruleset == "tld":
+                timelimit -= elapsed_time
 
             converted = convert(user_response.content)
 
@@ -129,18 +135,31 @@ async def delve_game(ctx, bot):
 
                             correctly_answered += 1
                             count += 1
-                            currency += ((1+(timelimit-elapsed_time)) * difficulty_level * (eq_length - 1))
+                            if ruleset == "delve":
+                                currency += ((1+(timelimit-elapsed_time)) * difficulty_level * (eq_length - 1))
+                            else:
+                                currency += (eq_length * ((1 + (timelimit - elapsed_time) / timelimit) **
+                                                          (correctly_answered/4) * difficulty_level)) / 1.8
+                            print(correctly_answered, eq_length, currency)
                             if count % 2 == 1:
                                 eq_length += 1
-                                timelimit += 0.5
+                                if ruleset == "delve":
+                                    timelimit += 0.5
                             if count % 4 == 1:
                                 difficulty_level += 1
 
-                        if elapsed_time >= timelimit:
-                            game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
-                                           .format(elapsed_time))
-                            failed_attempt = "Level {} - Out of Time".format(count)
-                            count = 0
+                        if ruleset == "delve":
+                            if elapsed_time >= timelimit:
+                                game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
+                                               .format(elapsed_time))
+                                failed_attempt = "Level {} - Out of Time".format(count)
+                                count = 0
+                        else:
+                            if timelimit <= 0:
+                                game_output = ("\nTime's up! The answer was correct.\nYou answered in: {:.2f}s"
+                                               .format(elapsed_time))
+                                failed_attempt = "Level {} - Out of Time".format(count)
+                                count = 0
 
                     else:
                         game_output = "\nIncorrect! The answer was: " + str(
@@ -169,8 +188,12 @@ async def delve_game(ctx, bot):
     currency_rounded = round(currency)
 
     if highest_cleared_level > 0 and fastest_time != float('inf'):
-        database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level,
-                                highest_abs_answer, fastest_time, correctly_answered)
+        if ruleset == "delve":
+            database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level,
+                                    highest_abs_answer, fastest_time, correctly_answered)
+        else:
+            database.tld_update_profile(ctx.author.id, discord_username, currency_rounded, correctly_answered,
+                                        highest_cleared_level)
         output_parts.append("Summary of the Attempt:\n")
         output_parts.append("Highest Level Cleared: Level {}".format(highest_cleared_level))
         output_parts.append("Fastest Answer in Attempt: {:.2f}s in Stage {}".format(fastest_time, fastest_stage))
