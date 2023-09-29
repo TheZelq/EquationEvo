@@ -140,7 +140,6 @@ async def play_game(ctx, bot, ruleset):
                             else:
                                 currency += (eq_length * ((1 + (timelimit - elapsed_time) / timelimit) **
                                                           (correctly_answered/4) * difficulty_level)) / 1.8
-                            print(correctly_answered, eq_length, currency)
                             if count % 2 == 1:
                                 eq_length += 1
                                 if ruleset == "delve":
