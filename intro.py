@@ -177,7 +177,7 @@ async def play_game(ctx, bot, ruleset):
     # Display summary
     output_parts = []
     discord_username = ctx.author.name
-    currency_rounded = round(currency)
+    currency_rounded = round(currency.real)
 
     if highest_cleared_level > 0 and fastest_time != float('inf'):
         if ruleset == "delve":

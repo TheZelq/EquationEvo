@@ -13,6 +13,9 @@ intents.message_content = True  # Enable message content intent
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+# Removing the default help command to avoid conflicts
+bot.remove_command('help')
+
 
 @bot.event
 async def on_ready():
@@ -155,5 +158,47 @@ async def whatis(ctx, arg=None):
         embed.add_field(name="", value=achievement_desc)
 
         await ctx.send(embed=embed)
+
+
+@bot.command()
+async def help(ctx):
+    help_embed = discord.Embed(
+        title="Bot Commands",
+        description="Faken is shit at delve don't @ me",
+        color=0x8080
+    )
+
+    help_embed.add_field(
+        name="!delve",
+        value="Default delving experience",
+        inline=False
+    )
+    help_embed.add_field(
+        name="!tld",
+        value="Delving with one non-regenerable timer",
+        inline=False
+    )
+    help_embed.add_field(
+        name="!profile (username)",
+        value="Displays the profile of the user",
+        inline=False
+    )
+    help_embed.add_field(
+        name="!leaderboard",
+        value="Displays the highest achieved floors with users who achieved that",
+        inline=False
+    )
+    help_embed.add_field(
+        name="!achievements",
+        value="Displays user's achievements",
+        inline=False
+    )
+    help_embed.add_field(
+        name="!whatis \"Name of the achievement\"",
+        value="Shows how to get an achievement",
+        inline=False
+    )
+
+    await ctx.send(embed=help_embed)
 
 bot.run(TOKEN)
