@@ -4,7 +4,7 @@ from discord.ext import commands
 from dotenv import load_dotenv
 from intro import play_game
 from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc, unlock_shop_access
-from shop import shop_items, shop_access
+from shop import veggie_stall_items, shop_access
 
 load_dotenv()
 TOKEN = os.getenv('DISCORD_TOKEN')
@@ -178,22 +178,40 @@ async def shop(ctx):
                            "into the abyss of revelation.")
         return
 
-    # Display the shop in a direct message
+    # Display the shop selection message in a direct message
     user = ctx.author
-    embed = discord.Embed(
-        title="The Emporium",
-        description="Welcome to the emporium.",
+    selection_embed = discord.Embed(
+        title="Select Shop",
+        description="Please select type of shop.",
         color=0x9400D3,
     )
 
-    for item in shop_items:
-        embed.add_field(
-            name=item["name"],
-            value=f"{item['description']}\nPrice: {item['price']} currency",
-            inline=False,
-        )
+    selection_message = await user.send(embed=selection_embed)
 
-    await user.send(embed=embed)
+    # Add button for Veggie Stall
+    selection_view = discord.ui.View()
+
+    async def on_veggie_stall(interaction: discord.Interaction):
+        # Display Veggie Stall items in the embed
+        veggie_stall_embed = discord.Embed(
+            title="Veggie Stall",
+            description="Welcome to the Veggie Stall.",
+            color=0x008000,  # Green color for veggies
+        )
+        for item in veggie_stall_items:
+            veggie_stall_embed.add_field(
+                name=item["name"],
+                value=f"{item['description']}\nPrice: {item['price']} currency",
+                inline=False,
+            )
+        await interaction.response.send_message(embed=veggie_stall_embed, ephemeral=True)
+
+    veggie_stall_button = discord.ui.Button(label="Veggie Stall", style=discord.ButtonStyle.grey, emoji="🫑")
+    veggie_stall_button.callback = on_veggie_stall
+    selection_view.add_item(veggie_stall_button)
+
+    await selection_message.edit(embed=selection_embed, view=selection_view)
+
     if isinstance(ctx.channel, discord.TextChannel):
         await ctx.send("Only in solitude may the Emporium's mysteries be revealed. The enigmatic proprietor shuns all "
                        "witnesses but the chosen.")
