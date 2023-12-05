@@ -146,8 +146,9 @@ def get_profile_data(discord_name):
                 'achievement_points': result[4],
                 'equations_solved': result[5],
                 'highest_stage': result[6],
-                'rounded_fastest_time': result[7],
-                'new_highest_abs_answer': result[8],
+                'rounded_fastest_time': result[8],
+                'new_highest_abs_answer': result[9],
+                'shop_access': result[10],
             }
             return profile_data
         else:
@@ -229,6 +230,23 @@ def leaderboard_data():
             return leaderboard
         else:
             return None
+
+    except Exception as e:
+        print("Error:", e)
+
+
+async def unlock_shop_access(discord_id):
+    try:
+        connection = connect()
+        cursor = connection.cursor()
+
+        update_query = "UPDATE profiles SET shop_access = 1 WHERE discord_id = %s"
+        cursor.execute(update_query, (discord_id,))
+        connection.commit()
+        print(f"Shop access unlocked for {discord_id}")
+
+        cursor.close()
+        connection.close()
 
     except Exception as e:
         print("Error:", e)
