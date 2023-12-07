@@ -38,7 +38,7 @@ async def play_game(ctx, bot, ruleset):
     currency = 0
     consolidation_prize = 0
 
-    if ruleset == "delve":
+    if ruleset == "delve" or "challenge":
         timelimit = 5
     else:
         timelimit = 60
@@ -119,7 +119,7 @@ async def play_game(ctx, bot, ruleset):
 
                     # Check user's answer and time
                     if answer_num == eval(answer_text):
-                        if elapsed_time <= timelimit and ruleset == "delve" or timelimit > 0 and ruleset == "tld":
+                        if elapsed_time <= timelimit and ruleset == "delve" or elapsed_time <= timelimit and ruleset == "challenge" or timelimit > 0 and ruleset == "tld":
                             game_output = "\nCorrect! You answered in: {:.2f}s\n".format(elapsed_time)
                             cleared_levels.append(count)
                             highest_cleared_level = max(cleared_levels)
@@ -136,10 +136,12 @@ async def play_game(ctx, bot, ruleset):
                             correctly_answered += 1
                             count += 1
                             if ruleset == "delve":
-                                currency += ((1+(timelimit-elapsed_time)) * difficulty_level * (eq_length - 1))
+                                currency += ((1 + (timelimit - elapsed_time)) * difficulty_level * (eq_length - 1))
+                            if ruleset == "challenge":
+                                currency += difficulty_level - 1
                             else:
                                 currency += (eq_length * ((1 + (timelimit - elapsed_time) / timelimit) **
-                                                          (correctly_answered/4) * difficulty_level)) / 1.8
+                                                          (correctly_answered / 4) * difficulty_level)) / 1.8
                             if count % 2 == 1:
                                 eq_length += 1
                                 if ruleset == "delve":
@@ -170,9 +172,12 @@ async def play_game(ctx, bot, ruleset):
             count = 0
 
         # Checking if the player has failed before level 5 to award a specific item for them
-        if highest_cleared_level <= 4 and count == 0 and random.randint(1, 32) <= 1:
-            currency += 25  # Adding currency automatically
-            consolidation_prize = 1
+        if highest_cleared_level <= 4 and count == 0:
+            if ruleset == "delve" and random.randint(1, 32) <= 1:
+                currency += 25  # 1/32 chance for getting 25 FC if failing before level 5
+                consolidation_prize = 1
+            if ruleset == "challenge" and random.randint(1, 2) <= 1:
+                currency += 1  # 50% chance to receive 1 CC if failing before level 5
 
     # Display summary
     output_parts = []
@@ -183,6 +188,10 @@ async def play_game(ctx, bot, ruleset):
         if ruleset == "delve":
             database.update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level,
                                     highest_abs_answer, fastest_time, correctly_answered)
+        if ruleset == "challenge":
+            database.chall_update_profile(ctx.author.id, discord_username, currency_rounded, highest_cleared_level,
+                                          highest_abs_answer, fastest_time, correctly_answered, difficulty_level)
+            database.challenge_time(ctx.author.id)
         else:
             database.tld_update_profile(ctx.author.id, discord_username, currency_rounded, correctly_answered,
                                         highest_cleared_level)

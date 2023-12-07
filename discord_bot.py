@@ -1,9 +1,10 @@
 import os
 import discord
+from datetime import datetime
 from discord.ext import commands
 from dotenv import load_dotenv
 from intro import play_game
-from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc, unlock_shop_access
+from database import get_profile_data, leaderboard_data, get_achievements_data, get_achievement_desc, unlock_shop_access, get_energy_info, get_energy_max_info
 from shop import veggie_stall_items, shop_access
 
 load_dotenv()
@@ -18,40 +19,122 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 bot.remove_command('help')
 
 
+# Setting the bot ready up and down
+
+
 @bot.event
 async def on_ready():
     print(f'{bot.user} has connected to Discord!')
     await bot.change_presence(activity=discord.Game(name="with the abyss"))  # Set bots activity
-    channel = bot.get_channel(1133542620551987361)  # Replace with the actual channel ID
+    channel = bot.get_channel(1181867609285726238)  # Replace with the actual channel ID
     if channel:
-        await channel.send("<@213540116386414592> It's delving time!")
+        # Check if there are any previous messages by the bot in the channel
+        async for message in channel.history(limit=None):
+            if message.author == bot.user:
+                # If there's a previous message by the bot, edit it
+                await message.edit(
+                    content=f"```Current bot status: ONLINE\nOnline since: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC```")
+                break
+        else:
+            # If no previous message, send a new one
+            await channel.send(
+                f"```Current bot status: ONLINE\nOnline since: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC```")
+
+
+@bot.command()
+async def kill(ctx):
+    admin_id = int(os.getenv('USER_ID'))
+    admin_channel = int(os.getenv('ADMIN'))
+    channel = bot.get_channel(1181867609285726238)
+    if ctx.author.id == admin_id and ctx.channel.id == admin_channel:
+        await ctx.send("Turning off the bot...")
+        if channel:
+            async for message in channel.history(limit=None):
+                if message.author == bot.user:
+                    await message.edit(
+                        content=f"```Current bot status: OFFLINE\nOffline since: {datetime.utcnow().strftime('%Y-%m-%d %H:%M:%S')} UTC```")
+        print(f'{bot.user} successfully shut down!')
+        await bot.close()
+    else:
+        await ctx.send("You don't have permissions to use this commend!")
+
+
+# Various delve modes section
 
 
 @bot.command()
 async def delve(ctx):
     ruleset = "delve"
-    game_output = await play_game(ctx, bot, ruleset)  # Call the delve function without any parameters
-    await ctx.send(game_output)   # Send the game output as a message in the channel
+    game_output = await play_game(ctx, bot, ruleset)  # Classic delve gamemode
+    await ctx.send(game_output)
 
 
 @bot.command()
 async def tld(ctx):
     ruleset = "tld"
-    game_output = await play_game(ctx, bot, ruleset)  # Call the delve function without any parameters
-    await ctx.send(game_output)   # Send the game output as a message in the channel
+    game_output = await play_game(ctx, bot, ruleset)  # Time-Limited delve gamemode
+    await ctx.send(game_output)
+
+
+@bot.command()
+async def challenge(ctx):
+    discord_id = ctx.author.id
+
+    nrg_v_value = get_energy_info(discord_id)
+
+    if nrg_v_value > 0:
+        ruleset = "challenge"
+        game_output = await play_game(ctx, bot, ruleset)  # Challenge delve gamemode
+        await ctx.send(game_output)
+    else:
+        await ctx.send("You don't have enough {energy resource} to challenge for now.")
+
+
+@bot.command()
+async def check(ctx, arg=None):
+    discord_id = ctx.author.id  # Get user's Discord ID
+    if arg is None:
+        user = ctx.author
+    else:
+        try:
+            user = await commands.MemberConverter().convert(ctx, arg)
+        except commands.MemberNotFound:
+            await ctx.send("User not found.")
+            return
+
+    # Fetch NRG_V, NRG_M from the database using get_energy_info and get_energy_max_info functions
+    nrg_v = get_energy_info(discord_id)
+    nrg_m = get_energy_max_info(discord_id)
+
+    embed = discord.Embed(
+        title="Energy Status",
+        color=0x992D22
+    )
+    embed.set_thumbnail(url=user.avatar.url)  # Set user's avatar as thumbnail
+    embed.add_field(name="Energy", value=f"{nrg_v} / {nrg_m}", inline=True)
+    await ctx.send(embed=embed)
+
+
+# Account Commands
 
 
 @bot.command()
 async def profile(ctx, arg=None):
     if arg is None:
-        user_name = str(ctx.author.name)
+        user = ctx.author
     else:
-        user_name = str(arg)
-    profile_data = get_profile_data(user_name)
+        try:
+            user = await commands.MemberConverter().convert(ctx, arg)
+        except commands.MemberNotFound:
+            await ctx.send("User not found.")
+            return
+
+    profile_data = get_profile_data(user.name)
 
     if profile_data:
         name = profile_data['name']
-        currency = profile_data['currency']
+        currency = profile_data['FreeC']
+        chall_currency = profile_data['ChallC']
         achievement_points = profile_data['achievement_points']
         equations_solved = profile_data['equations_solved']
         highest_stage = profile_data['highest_stage']
@@ -63,8 +146,11 @@ async def profile(ctx, arg=None):
             color=0x10e3e3
         )
 
+        embed.set_thumbnail(url=user.avatar.url)  # Set user's avatar as thumbnail
+
         embed.add_field(name="Name", value=name, inline=False)
-        embed.add_field(name="Currency", value=currency, inline=False)
+        embed.add_field(name="FC (Free Curr.)", value=currency, inline=False)
+        embed.add_field(name="CC (Chall Curr.)", value=chall_currency, inline=False)
         embed.add_field(name="Achievement Points", value=achievement_points, inline=False)
         embed.add_field(name="Equations Solved", value=equations_solved, inline=False)
         embed.add_field(name="Highest Stage Solved", value=highest_stage, inline=False)
@@ -159,6 +245,8 @@ async def whatis(ctx, arg=None):
         embed.add_field(name="", value=achievement_desc)
 
         await ctx.send(embed=embed)
+
+# Shop Commands
 
 
 @bot.command()

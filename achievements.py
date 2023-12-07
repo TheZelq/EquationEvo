@@ -7,7 +7,7 @@ def achievements_solved(discord_name):
         cursor = connection.cursor()
         achievement_text = ""
 
-        select_query = ("SELECT user_id, equations_answered, highest_stage, highest_abs_answer FROM profiles WHERE "
+        select_query = ("SELECT user_id, EQ_Ans, Free_High, High_Ans FROM profiles WHERE "
                         "name = %s")
         cursor.execute(select_query, (discord_name,))
         result = cursor.fetchone()
